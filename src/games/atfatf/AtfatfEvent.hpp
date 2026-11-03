@@ -1,0 +1,14 @@
+#pragma once
+
+enum class AtfatfEvent {
+    NONE,
+    FISH_EATEN,
+    POWER_PELLET_EATEN,
+    PLAYER_MOVED,
+	PLAYER_DIED,
+	LEVEL_COMPLETED,
+	LEVEL_FAILED,
+    GAME_STARTED,
+	GAME_RESTARTED,
+    GAME_OVER
+};
