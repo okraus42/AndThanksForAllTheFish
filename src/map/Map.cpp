@@ -38,8 +38,7 @@ TileType& Map::at(Position p)
 
 bool Map::inBounds(std::uint32_t x, std::uint32_t y) const
 {
-    return x >= 0 && y >= 0 &&
-           x < m_width && y < m_height;
+    return x < m_width && y < m_height;
 }
 
 std::uint32_t Map::width() const

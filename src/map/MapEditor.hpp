@@ -3,6 +3,7 @@
 
 #include "map/Map.hpp"
 #include "maze/Maze.hpp"
+#include <string>
 
 class MapEditor
 {
