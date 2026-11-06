@@ -55,3 +55,4 @@ atfatf_game
 # more custom
 log.*
 scores
+.DS_Store
