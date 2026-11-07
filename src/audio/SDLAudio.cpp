@@ -24,6 +24,7 @@ SDLAudio::SDLAudio() {
     // Load SFX audio
     pelletAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_movement_ladder1a.wav", true);
     moveAudio   = MIX_LoadAudio(mixer, "assets/sounds/sfx_movement_jump1.wav", true);
+	levelOverAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_sounds_falling10.wav", true);
 
     // Create persistent tracks
     if (pelletAudio) {
@@ -31,13 +32,19 @@ SDLAudio::SDLAudio() {
 		
         LOG_VERBOSE("Created pellet track: {}", fishTrack ? "success" : "failure");
         MIX_SetTrackAudio(fishTrack, pelletAudio);
-        MIX_SetTrackGain(fishTrack, PELLET_VOLUME * masterSFXVolume);
+        MIX_SetTrackGain(fishTrack, FISH_VOLUME * masterSFXVolume);
     }
     if (moveAudio) {
         moveTrack = MIX_CreateTrack(mixer);
-        LOG_VERBOSE("Created move track: {}", fishTrack ? "success" : "failure");
+        LOG_VERBOSE("Created move track: {}", moveTrack ? "success" : "failure");
         MIX_SetTrackAudio(moveTrack, moveAudio);
         MIX_SetTrackGain(moveTrack, MOVE_VOLUME * masterSFXVolume);
+    }
+	if (levelOverAudio) {
+        levelOverTrack = MIX_CreateTrack(mixer);
+        LOG_VERBOSE("Created levelOver track: {}", levelOverTrack ? "success" : "failure");
+        MIX_SetTrackAudio(levelOverTrack, levelOverAudio);
+        MIX_SetTrackGain(levelOverTrack, LEVELOVER_VOLUME * masterSFXVolume);
     }
 
     // Load music as audio; we assign to track when playing
@@ -59,6 +66,10 @@ SDLAudio::~SDLAudio() {
     if (moveTrack) {
         MIX_DestroyTrack(moveTrack);
         moveTrack = nullptr;
+    }
+	if (levelOverTrack) {
+        MIX_DestroyTrack(levelOverTrack);
+        levelOverTrack = nullptr;
     }
     if (musicTrack) {
         MIX_DestroyTrack(musicTrack);
@@ -101,7 +112,10 @@ void SDLAudio::playEvent(AtfatfEvent event) {
             if (fishTrack) MIX_PlayTrack(fishTrack, 0);
             break;
 
-        case AtfatfEvent::PLAYER_MOVED:
+        case AtfatfEvent::LEVEL_FAILED:
+            if (levelOverTrack) MIX_PlayTrack(levelOverTrack, 0);
+            break;
+		case AtfatfEvent::PLAYER_MOVED:
             if (moveTrack &&
                 (now - lastMoveSoundTime >= moveSoundCooldown)) {
                 MIX_PlayTrack(moveTrack, 0);
@@ -155,8 +169,9 @@ void SDLAudio::stopMusic() {
 
 void SDLAudio::setMasterSFXVolume(float vol) {
     masterSFXVolume = vol;
-    if (fishTrack) MIX_SetTrackGain(fishTrack, PELLET_VOLUME * masterSFXVolume);
+    if (fishTrack) MIX_SetTrackGain(fishTrack, FISH_VOLUME * masterSFXVolume);
     if (moveTrack)   MIX_SetTrackGain(moveTrack, MOVE_VOLUME * masterSFXVolume);
+	if (levelOverTrack)   MIX_SetTrackGain(levelOverTrack, LEVELOVER_VOLUME * masterSFXVolume);
 }
 
 void SDLAudio::setMasterMusicVolume(float vol) {

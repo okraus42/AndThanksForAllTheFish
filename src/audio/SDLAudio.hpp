@@ -28,17 +28,20 @@ private:
 
     MIX_Track* fishTrack = nullptr;
     MIX_Track* moveTrack   = nullptr;
+	MIX_Track* levelOverTrack   = nullptr;
 
     MIX_Audio* menuMusicAudio = nullptr;
     MIX_Audio* gameMusicAudio = nullptr;
+	MIX_Audio* levelOverAudio = nullptr;
     MIX_Track* musicTrack     = nullptr;
 
     float masterSFXVolume   = 0.6f;
     float masterMusicVolume = 0.2f;
 
     // relative volumes
-    static constexpr float PELLET_VOLUME = 0.8f;
-    static constexpr float MOVE_VOLUME   = 0.3f;
+    static constexpr float FISH_VOLUME = 0.5f;
+    static constexpr float MOVE_VOLUME   = 0.125f;
+	static constexpr float LEVELOVER_VOLUME   = 0.5f;
 
     std::chrono::steady_clock::time_point lastMoveSoundTime{};
     const std::chrono::milliseconds moveSoundCooldown{170};
