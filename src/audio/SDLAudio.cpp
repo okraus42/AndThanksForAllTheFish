@@ -22,16 +22,19 @@ SDLAudio::SDLAudio() {
     }
 
     // Load SFX audio
-    pelletAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_movement_ladder1a.wav", true);
+    fishAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_movement_ladder1a.wav", true);
     moveAudio   = MIX_LoadAudio(mixer, "assets/sounds/sfx_movement_jump1.wav", true);
+	timeWarningAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_sounds_blip1.wav", true);
+	playerHurtAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_sounds_damage1.wav", true);
+	levelCompletedAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_movement_portal2.wav", true);
 	levelOverAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_sounds_falling10.wav", true);
 
     // Create persistent tracks
-    if (pelletAudio) {
+    if (fishAudio) {
         fishTrack = MIX_CreateTrack(mixer);
 		
-        LOG_VERBOSE("Created pellet track: {}", fishTrack ? "success" : "failure");
-        MIX_SetTrackAudio(fishTrack, pelletAudio);
+        LOG_VERBOSE("Created fish track: {}", fishTrack ? "success" : "failure");
+        MIX_SetTrackAudio(fishTrack, fishAudio);
         MIX_SetTrackGain(fishTrack, FISH_VOLUME * masterSFXVolume);
     }
     if (moveAudio) {
@@ -39,6 +42,24 @@ SDLAudio::SDLAudio() {
         LOG_VERBOSE("Created move track: {}", moveTrack ? "success" : "failure");
         MIX_SetTrackAudio(moveTrack, moveAudio);
         MIX_SetTrackGain(moveTrack, MOVE_VOLUME * masterSFXVolume);
+    }
+	if (timeWarningAudio) {
+        timeWarningTrack = MIX_CreateTrack(mixer);
+        LOG_VERBOSE("Created timeWarning track: {}", timeWarningTrack ? "success" : "failure");
+        MIX_SetTrackAudio(timeWarningTrack, timeWarningAudio);
+        MIX_SetTrackGain(timeWarningTrack, TIMEWARNING_VOLUME * masterSFXVolume);
+    }
+	if (playerHurtAudio) {
+        playerHurtTrack = MIX_CreateTrack(mixer);
+        LOG_VERBOSE("Created playerHurt track: {}", playerHurtTrack ? "success" : "failure");
+        MIX_SetTrackAudio(playerHurtTrack, playerHurtAudio);
+        MIX_SetTrackGain(playerHurtTrack, PLAYERHURT_VOLUME * masterSFXVolume);
+    }
+	if (levelCompletedAudio) {
+        levelCompletedTrack = MIX_CreateTrack(mixer);
+        LOG_VERBOSE("Created levelCompleted track: {}", levelCompletedTrack ? "success" : "failure");
+        MIX_SetTrackAudio(levelCompletedTrack, levelCompletedAudio);
+        MIX_SetTrackGain(levelCompletedTrack, LEVELCOMPLETED_VOLUME * masterSFXVolume);
     }
 	if (levelOverAudio) {
         levelOverTrack = MIX_CreateTrack(mixer);
@@ -67,6 +88,18 @@ SDLAudio::~SDLAudio() {
         MIX_DestroyTrack(moveTrack);
         moveTrack = nullptr;
     }
+	if (timeWarningTrack) {
+        MIX_DestroyTrack(timeWarningTrack);
+        timeWarningTrack = nullptr;
+    }
+	if (playerHurtTrack) {
+        MIX_DestroyTrack(playerHurtTrack);
+        playerHurtTrack = nullptr;
+    }
+	if (levelCompletedTrack) {
+        MIX_DestroyTrack(levelCompletedTrack);
+        levelCompletedTrack = nullptr;
+    }
 	if (levelOverTrack) {
         MIX_DestroyTrack(levelOverTrack);
         levelOverTrack = nullptr;
@@ -77,13 +110,29 @@ SDLAudio::~SDLAudio() {
     }
 
     // Destroy audio objects (safe even if assigned to old tracks)
-    if (pelletAudio) {
-        MIX_DestroyAudio(pelletAudio);
-        pelletAudio = nullptr;
+    if (fishAudio) {
+        MIX_DestroyAudio(fishAudio);
+        fishAudio = nullptr;
     }
     if (moveAudio) {
         MIX_DestroyAudio(moveAudio);
         moveAudio = nullptr;
+    }
+	if (timeWarningAudio) {
+        MIX_DestroyAudio(timeWarningAudio);
+        timeWarningAudio = nullptr;
+    }
+	if (playerHurtAudio) {
+        MIX_DestroyAudio(playerHurtAudio);
+        playerHurtAudio = nullptr;
+    }
+	if (levelCompletedAudio) {
+        MIX_DestroyAudio(levelCompletedAudio);
+        levelCompletedAudio = nullptr;
+    }
+	if (levelOverAudio) {
+        MIX_DestroyAudio(levelOverAudio);
+        levelOverAudio = nullptr;
     }
     if (menuMusicAudio) {
         MIX_DestroyAudio(menuMusicAudio);
@@ -111,7 +160,15 @@ void SDLAudio::playEvent(AtfatfEvent event) {
         case AtfatfEvent::FISH_EATEN:
             if (fishTrack) MIX_PlayTrack(fishTrack, 0);
             break;
-
+		case AtfatfEvent::TIME_WARNING:
+            if (timeWarningTrack) MIX_PlayTrack(timeWarningTrack, 0);
+            break;
+		case AtfatfEvent::PLAYER_HURT:
+            if (playerHurtTrack) MIX_PlayTrack(playerHurtTrack, 0);
+            break;
+		case AtfatfEvent::LEVEL_COMPLETED:
+            if (levelCompletedTrack) MIX_PlayTrack(levelCompletedTrack, 0);
+            break;
         case AtfatfEvent::LEVEL_FAILED:
             if (levelOverTrack) MIX_PlayTrack(levelOverTrack, 0);
             break;

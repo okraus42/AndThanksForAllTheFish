@@ -94,6 +94,7 @@ void AtfatfGameState::update(double dt) {
         engine.getAudio().playEvent(event);
 		if (event == AtfatfEvent::GAME_OVER) {
 			endGame();
+			return ;
 		}
     }
     game.events.clear();

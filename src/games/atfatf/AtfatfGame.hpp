@@ -82,6 +82,9 @@ private:
 	unsigned int frame = 0;
 	unsigned int steps = 0;
 	bool isMoving = false;
+	uint64_t timeFreeze = 0; //ms
+	AtfatfEvent freezeEvent;
+	int timeWarnings = 5;
 
 	std::string name = "tester";
 	std::string coalition = "Aurora";

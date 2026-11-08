@@ -95,7 +95,7 @@ void AtfatfGame::init(const std::string& mapPath) {
 
 void AtfatfGame::nextLevel(void) {
     MapEditor editor(map);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+	timeFreeze += 1500;
 	std::string mapPath = std::format("./assets/maps/level{:02}.map", level);
 	++level;
 	lives += 32;
@@ -132,7 +132,7 @@ void AtfatfGame::nextLevel(void) {
 
 void AtfatfGame::sameLevel(void) {
     MapEditor editor(map);
-	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	timeFreeze += 500;
 	--level;
 	std::string mapPath = std::format("./assets/maps/level{:02}.map", level);
 	++level;
@@ -201,12 +201,12 @@ void AtfatfGame::handleInput(InputKey input) {
 			break;
 		}
 		case InputKey::F2: { //cheat
-			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			timeFreeze += 500;
 			sameLevel();
 			break;
 		}
 		case InputKey::F3: { //cheat
-			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			timeFreeze += 500;
 			nextLevel();
 			break;
 		}
@@ -359,7 +359,7 @@ void AtfatfGame::moveShark(int shark) {
 
 	// attack player
 	if (overlapsEnough(playerPos.x, playerPos.y, tileSize, sharksPos[shark].x, sharksPos[shark].y, tileSize)) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		timeFreeze += 100;
 		if (timeLeft >= 250)
 			timeLeft -= 250;
 		else
@@ -368,15 +368,20 @@ void AtfatfGame::moveShark(int shark) {
 			score -= 10;
 		else
 			score = 0;
-		if (lives % 32 != 1)
+		if (lives % 32 != 1) {
 			--lives;
+			events.push_back(AtfatfEvent::PLAYER_HURT);
+		}
 		else if (lives > 1) {
 			--lives;
-			events.push_back(AtfatfEvent::LEVEL_FAILED);
-			sameLevel();
+			timeFreeze = 1000;
+			freezeEvent = AtfatfEvent::LEVEL_FAILED;
+			events.push_back(freezeEvent);
 		}
 		else {
-			events.push_back(AtfatfEvent::GAME_OVER);
+			timeFreeze = 1000;
+			freezeEvent = AtfatfEvent::GAME_OVER;
+			events.push_back(AtfatfEvent::LEVEL_FAILED);
 		}
 	}
 }
@@ -440,9 +445,10 @@ void AtfatfGame::movePlayer(void) {
 		moveSharks();
     }
 	if (playerPos.x % tileSize == 0 && playerPos.y % tileSize == 0 && map.get(playerPos.x / tileSize, playerPos.y / tileSize) == TileType::Exit && fishTotal == 0) {
-		events.push_back(AtfatfEvent::LEVEL_COMPLETED);
+		timeFreeze = 1500;
+		freezeEvent = AtfatfEvent::LEVEL_COMPLETED;
+		events.push_back(freezeEvent);
 		score += timeLeft * level / 100;
-		nextLevel();
 	}
     // teleport through tunnels
     if (playerPos.x < playerSpeed)
@@ -459,17 +465,6 @@ void AtfatfGame::movePlayer(void) {
 
 void AtfatfGame::update(double) {
 	frame++;
-    movePlayer();
-	if (timeLeft == 0) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-		events.push_back(AtfatfEvent::GAME_OVER);
-	}
-    // moveSharks();
-    // push events?
-}
-
-void AtfatfGame::render(IRenderer& renderer) {
-	LOG_VERBOSE("In renderer TimeLeft: {} Level: {} Lives: {}", timeLeft, level, lives);
 	uint64_t now = getTimeInMilliseconds();
 	uint64_t timeDiff = now - lastTime;
 	lastTime = now;
@@ -480,6 +475,68 @@ void AtfatfGame::render(IRenderer& renderer) {
 		timeLeft = 0;
 		// endGame
 	}
+	if (timeLeft > 5000) {
+		timeWarnings = 5;
+	}
+	else if (timeLeft < 5000 && timeWarnings > 4) {
+		--timeWarnings;
+		events.push_back(AtfatfEvent::TIME_WARNING);
+	}
+	else if (timeLeft < 4000 && timeWarnings > 3) {
+		--timeWarnings;
+		events.push_back(AtfatfEvent::TIME_WARNING);
+	}
+	else if (timeLeft < 3000 && timeWarnings > 2) {
+		--timeWarnings;
+		events.push_back(AtfatfEvent::TIME_WARNING);
+	}
+	else if (timeLeft < 2000 && timeWarnings > 1) {
+		--timeWarnings;
+		events.push_back(AtfatfEvent::TIME_WARNING);
+	}
+	else if (timeLeft < 1000 && timeWarnings > 0) {
+		--timeWarnings;
+		events.push_back(AtfatfEvent::TIME_WARNING);
+	}
+	if (timeFreeze >= timeDiff){
+		timeFreeze -= timeDiff;
+	}
+	else {
+		timeFreeze = 0;
+	}
+	if (timeFreeze == 0) {
+		switch (freezeEvent) {
+			case AtfatfEvent::LEVEL_FAILED: {
+				freezeEvent = AtfatfEvent::NONE;
+				sameLevel();
+				break ;
+			}
+			case AtfatfEvent::LEVEL_COMPLETED: {
+				freezeEvent = AtfatfEvent::NONE;
+				nextLevel();
+				break ;
+			}
+			case AtfatfEvent::GAME_OVER: {
+				freezeEvent = AtfatfEvent::NONE;
+				events.push_back(AtfatfEvent::GAME_OVER);
+				break ;
+			}
+			default:
+				movePlayer();
+		}
+	}
+	if (timeLeft == 0 && timeFreeze == 0) {
+		timeFreeze = 1500;
+		events.push_back(AtfatfEvent::LEVEL_FAILED);
+		freezeEvent = AtfatfEvent::GAME_OVER;
+	}
+    // moveSharks();
+    // push events?
+}
+
+void AtfatfGame::render(IRenderer& renderer) {
+	LOG_VERBOSE("In renderer TimeLeft: {} Level: {} Lives: {}", timeLeft, level, lives);
+	
     static int frameCount = 0;
     frameCount++;
     uint8_t dir = 0;
