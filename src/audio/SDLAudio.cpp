@@ -25,7 +25,7 @@ SDLAudio::SDLAudio() {
     fishAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_movement_ladder1a.wav", true);
     moveAudio   = MIX_LoadAudio(mixer, "assets/sounds/sfx_movement_jump1.wav", true);
 	timeWarningAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_sounds_blip1.wav", true);
-	playerHurtAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_sounds_damage1.wav", true);
+	playerHurtAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_wpn_cannon4.wav", true);
 	levelCompletedAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_movement_portal2.wav", true);
 	levelOverAudio = MIX_LoadAudio(mixer, "assets/sounds/sfx_sounds_falling10.wav", true);
 
