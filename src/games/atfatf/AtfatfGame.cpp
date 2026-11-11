@@ -200,21 +200,21 @@ void AtfatfGame::handleInput(InputKey input) {
 			isMoving ^= true;
 			break;
 		}
-		case InputKey::F1: { //cheat
-			timeLeft += 30000;
-			lives += 32;
-			break;
-		}
-		case InputKey::F2: { //cheat
-			timeFreeze += 500;
-			sameLevel();
-			break;
-		}
-		case InputKey::F3: { //cheat
-			timeFreeze += 500;
-			nextLevel();
-			break;
-		}
+		// case InputKey::F1: { //cheat
+		// 	timeLeft += 30000;
+		// 	lives += 32;
+		// 	break;
+		// }
+		// case InputKey::F2: { //cheat
+		// 	timeFreeze += 500;
+		// 	sameLevel();
+		// 	break;
+		// }
+		// case InputKey::F3: { //cheat
+		// 	timeFreeze += 500;
+		// 	nextLevel();
+		// 	break;
+		// }
         default: break;
     }
 }
@@ -379,12 +379,12 @@ void AtfatfGame::moveShark(int shark) {
 		}
 		else if (lives > 1) {
 			--lives;
-			timeFreeze = 1000;
+			timeFreeze = 2000;
 			freezeEvent = AtfatfEvent::LEVEL_FAILED;
 			events.push_back(freezeEvent);
 		}
 		else {
-			timeFreeze = 1000;
+			timeFreeze = 2000;
 			freezeEvent = AtfatfEvent::GAME_OVER;
 			events.push_back(AtfatfEvent::LEVEL_FAILED);
 		}
@@ -531,7 +531,7 @@ void AtfatfGame::update(double) {
 		}
 	}
 	if (timeLeft == 0 && timeFreeze == 0) {
-		timeFreeze = 1500;
+		timeFreeze = 2000;
 		events.push_back(AtfatfEvent::LEVEL_FAILED);
 		freezeEvent = AtfatfEvent::GAME_OVER;
 	}
