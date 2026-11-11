@@ -95,8 +95,8 @@ void AtfatfGame::init(const std::string& mapPath) {
 
 void AtfatfGame::nextLevel(void) {
     MapEditor editor(map);
-	timeFreeze += 1500;
-	std::string mapPath = std::format("./assets/maps/level{:02}.map", level);
+	timeFreeze += 50;
+	std::string mapPath = std::format("./assets/maps/level{:02}.map", level % levels);
 	++level;
 	lives += 32;
 	timeLeft += 30000;
@@ -132,15 +132,20 @@ void AtfatfGame::nextLevel(void) {
 
 void AtfatfGame::sameLevel(void) {
     MapEditor editor(map);
-	timeFreeze += 500;
+	timeFreeze += 50;
 	--level;
-	std::string mapPath = std::format("./assets/maps/level{:02}.map", level);
+	std::string mapPath = std::format("./assets/maps/level{:02}.map", level % levels);
 	++level;
 	lastTime = getTimeInMilliseconds();
 	playerDir = 0;
 	playerNextDir = 0;
 	isMoving = false;
-    editor.buildFromPath(mapPath);
+	try {
+		editor.buildFromPath(mapPath);
+	}
+	catch (const std::exception& e) {
+		LOG_ERROR("Failed to load map {}: {}", mapPath, e.what());
+	}
 	sharksTotal = 0;
 	fishTotal = 0;
     // find spawn, exit and stuff

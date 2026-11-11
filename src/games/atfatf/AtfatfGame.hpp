@@ -76,6 +76,7 @@ private:
     int tileSize = 60;
 	int fishTotal = 0;
 	int level = 0;
+	const int levels = 10;
 	int lives = 32; // 32 is one life
 	uint64_t lastTime;
 	uint64_t timeLeft = 60000; //ms
