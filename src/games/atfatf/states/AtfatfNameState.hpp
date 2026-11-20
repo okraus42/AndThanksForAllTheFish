@@ -19,7 +19,7 @@ private:
 		"Eclipse",
 		"Supernova"
 	};
-	int coalitionID;
+	int coalitionID = 0;
 
     void moveSelection(int direction);
 

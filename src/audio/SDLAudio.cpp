@@ -181,6 +181,7 @@ void SDLAudio::playEvent(AtfatfEvent event) {
             break;
 
         case AtfatfEvent::GAME_STARTED:
+            stopMusic();
             playMusic("game", -1);
             break;
 

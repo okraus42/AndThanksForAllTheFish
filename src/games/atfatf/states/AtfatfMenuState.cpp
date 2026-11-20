@@ -9,6 +9,7 @@
 #include <iterator>
 
 AtfatfMenuState::AtfatfMenuState(Engine& eng) : engine(eng) {
+	engine.getAudio().stopMusic();
     engine.getAudio().playMusic("menu", -1);
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -36,7 +37,6 @@ void AtfatfMenuState::moveSelection(int direction)
 void AtfatfMenuState::handleInput(InputKey input) {
     if (input == InputKey::ENTER) {
 		if (activeButton == ButtonSelected::Tournament) {
-			engine.getAudio().stopMusic();
 			engine.setState(std::make_unique<AtfatfNameState>(engine));
 		}
 		else if (activeButton == ButtonSelected::Highscore) {
